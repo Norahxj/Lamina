@@ -1,0 +1,115 @@
+
+@startuml LaminaERD
+
+title Lamina - Entity Relationship Diagram
+
+hide circle
+hide methods
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+skinparam classAttributeIconSize 0
+
+skinparam entity {
+  BackgroundColor #F0F7F0
+  BorderColor #527B5D
+  FontColor #24452D
+}
+
+entity "users" as users {
+  * id : UUID <<PK>>
+  --
+  name : VARCHAR
+  email : VARCHAR <<UNIQUE>>
+  password_hash : VARCHAR
+  created_at : TIMESTAMP
+}
+
+entity "plants" as plants {
+  * id : UUID <<PK>>
+  --
+  scientific_name : VARCHAR
+  common_name : VARCHAR
+  family : VARCHAR
+  description : TEXT
+  native_habitat : TEXT
+  toxicity_information : TEXT
+  care_instructions : TEXT
+}
+
+entity "plant_images" as images {
+  * id : UUID <<PK>>
+  --
+  plant_id : UUID <<FK>>
+  image_url : TEXT
+  image_type : VARCHAR
+  attribution : TEXT
+}
+
+entity "regions" as regions {
+  * id : INTEGER <<PK>>
+  --
+  name_ar : VARCHAR
+  name_en : VARCHAR
+}
+
+entity "plant_distributions" as distributions {
+  * plant_id : UUID <<PK, FK>>
+  * region_id : INTEGER <<PK, FK>>
+  --
+  occurrence_status : VARCHAR
+  source : TEXT
+  last_verified : DATE
+}
+
+entity "plant_identifications" as identifications {
+  * id : UUID <<PK>>
+  --
+  user_id : UUID <<FK, NULLABLE>>
+  image_reference : TEXT
+  identified_at : TIMESTAMP
+  status : VARCHAR
+}
+
+entity "identification_candidates" as candidates {
+  * id : UUID <<PK>>
+  --
+  identification_id : UUID <<FK>>
+  plant_id : UUID <<FK, NULLABLE>>
+  predicted_name : VARCHAR
+  confidence_score : FLOAT
+  rank : INTEGER
+}
+
+entity "saved_plants" as saved {
+  * id : UUID <<PK>>
+  --
+  user_id : UUID <<FK>>
+  plant_id : UUID <<FK>>
+  saved_at : TIMESTAMP
+  notes : TEXT
+}
+
+entity "learning_contents" as learning {
+  * id : UUID <<PK>>
+  --
+  title : VARCHAR
+  body : TEXT
+  category : VARCHAR
+  published_at : TIMESTAMP
+}
+
+users ||--o{ saved : saves
+plants ||--o{ saved : is_saved
+
+users |o--o{ identifications : requests
+identifications ||--o{ candidates : returns
+plants |o--o{ candidates : possible_match
+
+plants ||--o{ images : has
+
+plants ||--o{ distributions : recorded_in
+regions ||--o{ distributions : contains
+
+@enduml

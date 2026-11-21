@@ -1,0 +1,57 @@
+
+@startuml PlantIdentificationActivity
+
+title Lamina - Plant Identification Activity Diagram
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #648875
+skinparam activity {
+  BackgroundColor #F0F7F0
+  BorderColor #527B5D
+  DiamondBackgroundColor #E1EFE3
+  DiamondBorderColor #527B5D
+}
+
+start
+
+:Open Identify Plant;
+
+:Capture or Upload Plant Image;
+
+while (Is the image valid?) is (No)
+  :Display Validation Error;
+  :Capture or Upload Another Image;
+endwhile (Yes)
+
+:Submit Image for Recognition;
+
+if (Recognition service available?) then (Yes)
+
+  :Analyze Plant Image;
+
+  if (Potential matches found?) then (Yes)
+    :Display Possible Plant Matches;
+    :Select a Plant;
+    :View Plant Details;
+
+    if (Save Plant?) then (Yes)
+      if (User authenticated?) then (Yes)
+        :Save Plant to Collection;
+      else (No)
+        :Prompt User to Log In;
+      endif
+    endif
+
+  else (No)
+    :Display No Matches Message;
+  endif
+
+else (No)
+  :Display Service Error;
+endif
+
+stop
+
+@enduml

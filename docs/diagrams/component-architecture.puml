@@ -1,0 +1,78 @@
+
+@startuml LaminaArchitecture
+
+title Lamina - System Component Architecture
+
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam linetype ortho
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam ArrowColor #527B5D
+skinparam ComponentBorderColor #527B5D
+skinparam ComponentBackgroundColor #F0F7F0
+skinparam PackageBorderColor #527B5D
+skinparam PackageBackgroundColor #FAFCFA
+
+package "Presentation Layer" {
+
+  component "Flutter Application\n(Web / Android / iOS)" as Flutter
+
+  component "UI Screens" as UI
+  component "State Management" as State
+  component "API Client" as Client
+
+  Flutter ..> UI
+  UI ..> State
+  State ..> Client
+}
+
+package "Application Layer - FastAPI Backend" {
+
+  component "REST API" as API
+
+  component "Authentication Module" as Auth
+  component "Plant Catalog Module" as Catalog
+  component "Plant Search Module" as Search
+  component "Identification Module" as Identify
+  component "Regional Map Module" as Map
+  component "Personal Collection Module" as Collection
+  component "Botanical Learning Module" as Learning
+
+  API --> Auth
+  API --> Catalog
+  API --> Search
+  API --> Identify
+  API --> Map
+  API --> Collection
+  API --> Learning
+}
+
+package "Data Layer" {
+
+  database "PostgreSQL" as DB
+  component "Image Storage" as Storage
+}
+
+cloud "External Plant Recognition API" as Recognition
+
+Client --> API : HTTPS / JSON
+
+Auth --> DB
+Catalog --> DB
+Search --> DB
+Identify --> DB
+Map --> DB
+Collection --> DB
+Learning --> DB
+
+Identify --> Recognition : Image Recognition Request
+Identify --> Storage : Store / Retrieve Images
+Catalog --> Storage : Retrieve Plant Images
+
+@enduml

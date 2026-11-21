@@ -1,0 +1,113 @@
+
+@startuml LaminaDomainModel
+
+title Lamina - Domain Class Diagram
+
+top to bottom direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55
+
+skinparam class {
+  BackgroundColor #F0F7F0
+  BorderColor #527B5D
+  ArrowColor #527B5D
+  FontColor #24452D
+}
+
+package "User Management" {
+  class User {
+    +id: UUID
+    +name: String
+    +email: String
+    +passwordHash: String
+    +createdAt: DateTime
+  }
+}
+
+package "Botanical Catalog" {
+  class Plant {
+    +id: UUID
+    +scientificName: String
+    +commonName: String
+    +family: String
+    +description: Text
+    +nativeHabitat: String
+    +toxicityInformation: Text
+    +careInstructions: Text
+  }
+
+  class Region {
+    +id: Integer
+    +nameAr: String
+    +nameEn: String
+  }
+
+  class PlantDistribution {
+    +plantId: UUID
+    +regionId: Integer
+    +occurrenceStatus: String
+    +source: String
+    +lastVerified: Date
+  }
+}
+
+package "Plant Identification" {
+  class PlantIdentification {
+    +id: UUID
+    +userId: UUID
+    +imageReference: String
+    +identifiedAt: DateTime
+    +status: String
+  }
+
+  class IdentificationCandidate {
+    +id: UUID
+    +plantIdentificationId: UUID
+    +plantId: UUID
+    +confidenceScore: Float
+    +rank: Integer
+  }
+}
+
+package "Personal Collection" {
+  class SavedPlant {
+    +id: UUID
+    +userId: UUID
+    +plantId: UUID
+    +savedAt: DateTime
+    +notes: Text
+  }
+}
+
+package "Botanical Learning" {
+  class LearningContent {
+    +id: UUID
+    +title: String
+    +body: Text
+    +category: String
+    +publishedAt: DateTime
+  }
+}
+
+' User relationships
+User "1" -- "0..*" SavedPlant : saves
+User "0..1" -- "0..*" PlantIdentification : requests
+
+' Botanical distribution
+Plant "1" -- "0..*" PlantDistribution
+Region "1" -- "0..*" PlantDistribution
+
+' Identification results
+PlantIdentification "1" *-- "0..*" IdentificationCandidate
+Plant "1" -- "0..*" IdentificationCandidate
+
+' Saved plants
+Plant "1" -- "0..*" SavedPlant
+
+@enduml

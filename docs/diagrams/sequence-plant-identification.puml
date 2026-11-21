@@ -1,0 +1,72 @@
+
+@startuml PlantIdentificationSequence
+
+title Lamina - Plant Identification Sequence Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequence {
+    ArrowColor #527B5D
+    LifeLineBorderColor #648875
+    LifeLineBackgroundColor #F0F7F0
+    ParticipantBorderColor #527B5D
+    ParticipantBackgroundColor #EAF4EC
+    ActorBorderColor #527B5D
+}
+
+actor User
+participant "Flutter App" as App
+participant "FastAPI Backend" as API
+participant "Plant Recognition Service" as AI
+database "Plant Database" as DB
+
+User -> App: Capture or upload image
+App -> API: POST /plants/identify (image)
+
+activate API
+
+API -> API: Validate image
+
+alt Invalid image
+    API --> App: 400 Bad Request
+    App --> User: Display validation error
+
+else Valid image
+    API -> AI: Submit image for recognition
+    activate AI
+
+    alt Recognition service unavailable
+        AI --> API: Service error
+        API --> App: 503 Service Unavailable
+        App --> User: Display service error
+
+    else Recognition completed
+        AI --> API: Return possible species
+        deactivate AI
+
+        alt Matches found
+            API -> DB: Retrieve matching plant records
+            DB --> API: Plant names and information
+            API --> App: Return possible plant matches
+            App --> User: Display identification results
+
+            opt User selects a plant
+                User -> App: Select plant
+                App -> API: GET /plants/{id}
+                API -> DB: Retrieve plant details
+                DB --> API: Plant details
+                API --> App: Return plant details
+                App --> User: Display plant information
+            end
+
+        else No matches found
+            API --> App: Return empty matches
+            App --> User: Display no matches message
+        end
+    end
+end
+
+deactivate API
+
+@enduml

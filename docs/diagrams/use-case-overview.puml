@@ -1,0 +1,46 @@
+
+@startuml LaminaOverview
+
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam actorStyle stickman
+
+skinparam usecase {
+  BackgroundColor #F0F7F0
+  BorderColor #527B5D
+  FontColor #24452D
+}
+
+skinparam rectangle {
+  BorderColor #527B5D
+}
+
+actor "Guest" as G
+actor "Registered User" as U
+
+rectangle "Lamina System" {
+
+  usecase "Identify Plants" as UC1
+  usecase "Search Plants" as UC2
+  usecase "Explore Saudi Map" as UC3
+  usecase "Learn About Plants" as UC4
+
+  usecase "Manage My Plants" as UC5
+  usecase "View Identification History" as UC6
+}
+
+G -- UC1
+G -- UC2
+G -- UC3
+G -- UC4
+
+U -- UC5
+U -- UC6
+
+U --|> G
+
+@enduml
